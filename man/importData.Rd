@@ -39,7 +39,8 @@ in katemmiller/vegcomNGPN).
 \dontrun{
 #--- From Local install of FFI SQL databases
 # Import data for AGFO
-importData(dbname = c("FFI_RA_AGFO"))
+library(utilsFFI)
+importData(dbname = "FFI_RA_AGFO")
 
 # Check that the import worked by listing names of tables in FFI_tables
 names(FFI_tables)

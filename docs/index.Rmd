@@ -1,0 +1,181 @@
+---
+output: html_document
+title: "Using utilsFFI R pkg." 
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(width = 10)
+```
+
+```{css echo = FALSE}
+.indent {
+margin-left: 25px;
+font-size: 14px;
+}
+
+.indent2 {
+margin-left: 50px;
+font-size: 12px;
+}
+
+.drop{
+  font-family: "Arial",Arial,sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  padding:0px 0px 0px 0px;
+  margin:0px 0px 0px 0px;
+}
+
+.fxn{
+  color:#1942B5;
+  font-size:14px;
+  font-weight: bold;
+}
+
+.title{
+ display:none;
+}
+/*
+h4{
+  color:#1942B5;
+}
+*/
+```
+
+## Using the `utilsFFI` R package {.tabset .tabset-pills}
+
+### Getting started {.tabset}
+
+#### Installation
+The `utilsFFI` package is a work in progress R package built by NPS users of FFI (FEAT/FIREMON Integrated) data. Currently this package only has an `importData()` function that imports all tables in the "dbo" schema from a local instance of an FFI database in SQL Server Management Studio (SSMS). Eventually, this package will allow a user with appropriate access the FFI server to download real-time data tables into R. 
+
+In time, more features will be added, such as functions that join the database tables to make them analysis- ready and allow for easy querying and summarizing. This documentation will be updated as more features are added.
+
+<h4><b>Step 1.</b> Install SQL Server Management Studio</h4>
+Instructions for installing SQL Server Management Studio (SSMS) are currently being developed. Once those are ready, they will be linked here. 
+
+<h4><b>Step 2.</b> Restore database from .bak file in SSMS</h4>
+To restore a database from a .bak file in SSMS, you can either restore through the file menu following the screencast or run the SQL code in SSMS below. 
+
+<b>File Menu option:</b>
+<video width="1000" height="514" controls>
+  <source src="www/restore_bak.mp4" type="video/mp4">
+</video>
+
+<b>SQL Code option:</b>
+The SQL code below will restore a .bak file to a database named "FFI_RA_AGFO". To use the code below, you only need to change "FFI_RA_AGFO" to match the name of your database (i.e., whatever precedes the .bak in the file name), and change the C:\\temp\\path to the path where your .bak file lives. Note that files on OneDrive often cause issues. It's best to restore from locations directly on your C:\\ drive or a server. 
+
+```{SQL, eval = F, results = 'asis'}
+-- Variables to declare and modify for different database name and file locations
+DECLARE @DBNAME NVARCHAR(MAX) = 'FFI_RA_AGFO'
+DECLARE @FilePathOrig NVARCHAR(MAX) = 'C:\\temp\\'
+DECLARE @FilePathNew NVARCHAR(MAX) = 'C:\\Program Files\\Microsoft SQL Server\\MSSQL15.SQLEXPRESS\\MSSQL\\DATA\\';
+DECLARE @SQL NVARCHAR(MAX);
+
+-- Run remaining query to restore database
+--USE [master]
+
+DECLARE @DATA NVARCHAR(MAX) = @FilePathNew + @DBNAME + '.mdf';
+DECLARE @LOG NVARCHAR(MAX) = @FilePathNew + @DBNAME + '.ldf';
+DECLARE @DBFULLPATH NVARCHAR(MAX) = @FilePathOrig + @DBNAME + '.bak';
+DECLARE @DBLOG NVARCHAR(MAX) = @DBNAME + '_log';
+
+USE[master]
+
+SET @SQL =
+  ' RESTORE DATABASE ['+@DBNAME+'] FROM DISK = '''+@DBFULLPATH+''' WITH FILE = 1, MOVE '''+@DBNAME+''' TO '''+@DATA+''',
+    MOVE '''+@DBLOG+''' TO '''+@LOG+''',
+    NOUNLOAD, STATS = 5'
+EXEC(@SQL)
+GO
+
+```
+
+<h4><b>Step 3.</b> Install R, RStudio, and RTools44 in Software Center</h4>
+Note that RTools is needed to install R packages from GitHub, and it only works with R versions 4.4.x. While R 4.5 is available on Software Center, the matching RTools45 isn't available yet. Until that changes, link RStudio to the latest version of R 4.4 (I'm currently using R 4.4.3).
+
+<details><summary class = 'drop'><span style='font-weight:normal;'>Troubleshooting Build Tools</span></summary>
+Unfortunately Software Center installs RTools44 in C:/Program Files/, not C:/, which is where RStudio looks for it by default. The following code helps RStudio find RTools. You may occasionally have to rerun this code (except for the `usethis` line), so keep it handy. You know when you have to rerun the code when you try to rebuild a package, and a window pops up to ask if you want to install missing build files.
+
+First install the `usethis` package if you don't have it installed. Then set .Renviron to find RTools on opening by opening the .Renviron file (second line), and pasting the code in the remaining lines into that file, and saving it. Now close/reopen RStudio, and you should be all set.
+```{r eval = F}
+install.packages('usethis')
+usethis::edit_r_environ()
+Sys.setenv(PATH = paste("C:\\PROGRA~1\\Rtools44\\bin", Sys.getenv("PATH"), sep=";"))
+Sys.setenv(BINPREF = "C:\\PROGRA~1\\Rtools44\\mingw_$(WIN)\\bin\\")
+```
+</details>
+<br>
+<h4><b>Step 4.</b> Install devtools package in R:</h4>
+```{r, eval = F, class.source = "indent"}
+install.packages('devtools')
+```
+<h4><b>Step 5.</b> Install utilsFFI from github</h4>
+Note that whenever the `utilsFFI` package is updated, you can rerun this code to install the latest version.
+```{r, eval = F, class.source = "indent"}
+library(devtools)
+install_github("KateMMiller/utilsFFI")
+```
+<details><summary class = 'drop'><span style='font-weight:normal;'>Troubleshooting GitHub package installation</span></summary>
+If you’re unable to install the R package via GitHub (often an error about permission being denied, download the following script from my OneDrive and open it in R: <a href = "https://doimspp-my.sharepoint.com/:u:/g/personal/kmmiller_nps_gov/ETaknusoEfVOs9tbIbx6QYEBre0WI-_xxi-C0M3JCX_xfw?e=n00UCO">fix_TLS_inspection.R</a>
+
+Once this script is open in R Studio, press Control + A to select all of the code. Then Control + Enter to run all of the code. Assuming you don’t return any errors, you should be able to install from GitHub. Now try to reinstall `utilsFFI`. If you're still running into issues, it could be that `devtools` is missing some package dependencies, which the error message will often mention. Install any missing packages and then try installing utilsFFI again. If you're still not successful, send Kate Miller (kathryn_miller@nps.gov) a screenshot of the error and she'll help you troubleshoot. 
+</details>
+<br>
+<h4><b>Step 6.</b> Load utilsFFI R package</h4>
+```{r}
+library(utilsFFI)
+```
+<h4><b>Step 7.</b> Import data</h4>
+Note that R is not able to connect to files on Sharepoint or MS Teams (Teams also stores all files on Sharepoint). That means you need to store data package files on your local machine or on a server. The default option for importing data will add the data package views (i.e., flatfiles) to an environment called FFI_tables to your Environment work space (i.e. Environment tab in top right panel). If you would rather import each individual view into your R session, specify with the new_env argument (e.g., `importData(new_env = F)`).
+```{r echo = F, results = 'hide', include = F}
+library(utilsFFI)
+importData(dbname = "FFI_RA_AGFO")
+```
+
+```{r eval = F}
+library(utilsFFI)
+importData(dbname = "FFI_RA_AGFO")
+```
+
+<h4><b>Step 8.</b> Play with the data </h4>
+The functions in the `utilsFFI` package are designed to work with the views, and are the best way to interact with the data to query by park, site, site type, year, parameter, etc. However, if you want to view the raw data, and you imported the data into the FFI_tables environment, you can access them with the code below:
+```{r eval = F}
+# See list of the views
+names(FFI_tables)
+
+# View one of the views
+View(FFI_tables$Results)
+
+# Assign a view to a data frame named res in R. Interact with res the way you would work with any normal data frame in R. 
+res <- FFI_tables$Results
+
+```
+
+#### Getting help
+<h4><b>Getting (and improving) help</b></h4>
+The functions in `utilsFFI` have help documentation like any R package. To view the help, you can go to the Packages tab and click on utilsFFI (see below). That will show you all the functions in the package. Clicking on individual functions will take you to the help documentation for that function. 
+```{r echo = F, out.width = 500, fig.align = 'center'}
+knitr::include_graphics("C:/NETN/R_Dev/utilsFFI/docs/www/finding_R_package.jpg")
+```
+
+<p class = 'fxn'>You can also see the help of a function by running, for example: </p>
+```{r, class.source = 'indent', eval = F}
+?importData
+```
+
+<p class = 'fxn'>If `utilsFFI` isn't loaded yet, you'd run: </p>
+```{r, class.source = 'indent', eval = F}
+?utilsFFI::importData
+```
+
+Each function's help includes a Description, Usage (i.e. function arguments and their defaults), Argument options/definitions, and several examples showing how the function can be used. 
+
+<b><span style='color:red;'>This is where you come in! If you notice typos or can think of better descriptions, examples, error messages, etc., please send them my way!</b></span> After we're more comfortable with R packages and get versed on GitHub, you'll be able to make those changes directly in the package. For now, you can just send me your suggestions and I'll make the changes.
+
+Finally, if you ever want to peak under the hood at the function, you can view it several ways. 
+<ol>
+<li>Keep F2 key pressed and click on the function name in R. This trick works for many but not all functions in R.</li>
+<li>View code in the <a href="https://github.com/KateMMiller/utilsFFI/tree/main">GitHub katemmiller/utilsFFI repo</a>. The functions are in the R folder. 
+

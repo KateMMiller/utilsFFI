@@ -1,0 +1,8 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.svg
+*.mp4
+*.jpg
+testing_scripts/

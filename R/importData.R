@@ -30,7 +30,8 @@
 #' \dontrun{
 #' #--- From Local install of FFI SQL databases
 #' # Import data for AGFO
-#' importData(dbname = c("FFI_RA_AGFO"))
+#' library(utilsFFI)
+#' importData(dbname = "FFI_RA_AGFO")
 #'
 #' # Check that the import worked by listing names of tables in FFI_tables
 #' names(FFI_tables)
@@ -76,7 +77,7 @@ importData <- function(type = "local", server = NA, dbname = "FFI_RA_AGFO", new_
         error = function(e){stop(error_mess)},
         warning = function(w){stop(error_mess)})
 
-      tbls <<- DBI::dbListTables(con, schema = "dbo")
+      tbls <- DBI::dbListTables(con, schema = "dbo")
 
       # Setup progress bar
       pb <- txtProgressBar(min = 0, max = length(tbls), style = 3)
