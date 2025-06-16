@@ -48,6 +48,7 @@ h4{
 ### Getting started {.tabset}
 
 #### Installation
+<h4><b>Overview</b></h4>
 The `utilsFFI` package is a work in progress R package built by NPS users of FFI (FEAT/FIREMON Integrated) data. Currently this package only has an `importData()` function that imports all tables in the "dbo" schema from a local instance of an FFI database in SQL Server Management Studio (SSMS). Eventually, this package will allow a user with appropriate access the FFI server to download real-time data tables into R. 
 
 In time, more features will be added, such as functions that join the database tables to make them analysis- ready and allow for easy querying and summarizing. This documentation will be updated as more features are added.
