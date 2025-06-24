@@ -23,9 +23,6 @@
 #' appears in SQL Server Management Studio
 #' (eg. "FFI_RA_AGFO").
 #'
-#' @param new_env Logical. If TRUE (default), will import tables to an environment
-#' named FFI_tables. If FALSE, will import tables to global environment.
-#'
 #' @examples
 #' \dontrun{
 #' #--- From Local install of FFI SQL databases
@@ -45,25 +42,23 @@
 #' head(macro)
 #' }
 #'
-#' @returns Either an environment with database tables as data frames for each imported database, or database
-#' tables directly in the global environment.
+#' @returns An environment with database tables as data frames for each imported database.
 #'
 #' @export
 #'
 
-importData <- function(type = "local", server = NA, dbname = "FFI_RA_AGFO", new_env = T){
+importData <- function(type = "local", server = NA, dbname = "FFI_RA_AGFO"){
   #---- Bug Handling ----
   type <- match.arg(type, c("local", "server", 'csv'))
   if(length(dbname) > 1){stop("Can only import 1 database at a time.")}
-  stopifnot(is.logical(new_env))
   if(any(is.na(dbname))){stop("Must specify a dbname to import tables from SMSS.")}
   #++++++ Update as more features are added ++++++
   if(type %in% c("server")){stop(paste0("Sorry, type = ", type, " is not yet enabled."))}
   if(type == "server" & is.na(server)){stop("Must specify a server address if type = 'server'")}
 
   #--- Start the import ---
-  if(new_env == TRUE){FFI_tables <<- new.env()}
-  env <- if(new_env == TRUE){FFI_tables} else {.GlobalEnv}
+  FFI_tables <<- new.env()
+  env <- FFI_tables
 
   if(type == "local"){
     error_mess <- paste0("Unable to connect to specified SQL database. Make sure you have a local installation of the database in SSMS, ",

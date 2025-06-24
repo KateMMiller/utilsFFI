@@ -4,7 +4,7 @@
 \alias{importData}
 \title{importData}
 \usage{
-importData(type = "local", server = NA, dbname = "FFI_RA_AGFO", new_env = T)
+importData(type = "local", server = NA, dbname = "FFI_RA_AGFO")
 }
 \arguments{
 \item{type}{Indicate how to import the database tables
@@ -18,13 +18,9 @@ FFI database on the production SQL Server).}
 \item{dbname}{Quoted name of database matching the name of the database as it
 appears in SQL Server Management Studio
 (eg. "FFI_RA_AGFO").}
-
-\item{new_env}{Logical. If TRUE (default), will import tables to an environment
-named FFI_tables. If FALSE, will import tables to global environment.}
 }
 \value{
-Either an environment with database tables as data frames for each imported database, or database
-tables directly in the global environment.
+An environment with database tables as data frames for each imported database.
 }
 \description{
 Imports data from FFI SQL Server database or csvs of FFI database

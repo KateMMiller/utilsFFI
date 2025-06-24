@@ -52,10 +52,10 @@ h4{
 The `utilsFFI` package is a work in progress R package built by NPS users of FFI (FEAT/FIREMON Integrated) data. Currently this package only has an `importData()` function that imports all tables in the "dbo" schema from a local instance of an FFI database in SQL Server Management Studio (SSMS). Eventually, this package will allow a user with appropriate access the FFI server to download real-time data tables into R. 
 
 In time, more features will be added, such as functions that join the database tables to make them analysis- ready and allow for easy querying and summarizing. This documentation will be updated as more features are added.
-
+<br>
 <h4><b>Step 1.</b> Install SQL Server Management Studio</h4>
 Instructions for installing SQL Server Management Studio (SSMS) are currently being developed. Once those are ready, they will be linked here. 
-
+<br>
 <h4><b>Step 2.</b> Restore database from .bak file in SSMS</h4>
 To restore a database from a .bak file in SSMS, you can either restore through the file menu following the screencast or run the SQL code in SSMS below. 
 
@@ -92,17 +92,21 @@ EXEC(@SQL)
 GO
 
 ```
-
+<br>
 <h4><b>Step 3.</b> Install R, RStudio, and RTools44 in Software Center</h4>
 Note that RTools is needed to install R packages from GitHub, and it only works with R versions 4.4.x. While R 4.5 is available on Software Center, the matching RTools45 isn't available yet. Until that changes, link RStudio to the latest version of R 4.4 (I'm currently using R 4.4.3).
 
-<details><summary class = 'drop'><span style='font-weight:normal;'>Troubleshooting Build Tools</span></summary>
+<details open><summary class = 'drop'><span style='font-weight:normal;color:red;'>Troubleshooting Build Tools</span></summary>
 Unfortunately Software Center installs RTools44 in C:/Program Files/, not C:/, which is where RStudio looks for it by default. The following code helps RStudio find RTools. You may occasionally have to rerun this code (except for the `usethis` line), so keep it handy. You know when you have to rerun the code when you try to rebuild a package, and a window pops up to ask if you want to install missing build files.
 
-First install the `usethis` package if you don't have it installed. Then set .Renviron to find RTools on opening by opening the .Renviron file (second line), and pasting the code in the remaining lines into that file, and saving it. Now close/reopen RStudio, and you should be all set.
+First install the `usethis` package if you don't have it installed. Then open the .Renviron using the code chunk below. 
 ```{r eval = F}
 install.packages('usethis')
 usethis::edit_r_environ()
+```
+
+Next set .Renviron to find RTools on opening by opening the pasting the code below into that file, and saving it. Now close/reopen RStudio, and you should be all set.
+```{r eval = FALSE}
 Sys.setenv(PATH = paste("C:\\PROGRA~1\\Rtools44\\bin", Sys.getenv("PATH"), sep=";"))
 Sys.setenv(BINPREF = "C:\\PROGRA~1\\Rtools44\\mingw_$(WIN)\\bin\\")
 ```
@@ -112,24 +116,35 @@ Sys.setenv(BINPREF = "C:\\PROGRA~1\\Rtools44\\mingw_$(WIN)\\bin\\")
 ```{r, eval = F, class.source = "indent"}
 install.packages('devtools')
 ```
-<h4><b>Step 5.</b> Install utilsFFI from github</h4>
+<br>
+<h4><b>Step 5.</b> Set up GitHub account if a new user</h4>
+To install R packages using `devtools`, you need to have a GitHub user account and active token. Instructions for setting up a GitHub account and connecting it to RStudio are on the <a href="https://katemmiller.github.io/IMD_R_Training_Advanced/">IMD Advanced R training website</a> from 2022. Go to Day 4: Version Control > Git and RStudio and complete the steps described. There's a lot of other good info on using GitHub in other tabs too.   
+<br>
+<h4><b>Step 6.</b> Install utilsFFI from GitHub</h4>
 Note that whenever the `utilsFFI` package is updated, you can rerun this code to install the latest version.
-```{r, eval = F, class.source = "indent"}
+```{r, eval = F}
 library(devtools)
 install_github("KateMMiller/utilsFFI")
 ```
-<details><summary class = 'drop'><span style='font-weight:normal;'>Troubleshooting GitHub package installation</span></summary>
-If you’re unable to install the R package via GitHub (often an error about permission being denied, download the following script from my OneDrive and open it in R: <a href = "https://doimspp-my.sharepoint.com/:u:/g/personal/kmmiller_nps_gov/ETaknusoEfVOs9tbIbx6QYEBre0WI-_xxi-C0M3JCX_xfw?e=n00UCO">fix_TLS_inspection.R</a>
+
+If you don't want to have a GitHub account, you can also install packages from GitHub by downloading a .zip file of the code (often called forking a repo), then running the code below. 
+```{r, eval = F}
+install.packages("utilsFFI.zip")
+```
+
+<details open><summary class = 'drop'><span style='font-weight:normal;color:red;'>Troubleshooting GitHub package installation</span></summary>
+If you’re unable to install the R package via GitHub (often an error about permission being denied, download the following script from my OneDrive and open it in R: <a href = "https://doimspp-my.sharepoint.com/:u:/g/personal/kmmiller_nps_gov/ETaknusoEfVOs9tbIbx6QYEBre0WI-_xxi-C0M3JCX_xfw?e=n00UCO">fix_TLS_inspection.R</a>. Download by left clicking on the link, then click in the download arrow in the top left of the screen. Save it to your machine, then open it in RStudio.
 
 Once this script is open in R Studio, press Control + A to select all of the code. Then Control + Enter to run all of the code. Assuming you don’t return any errors, you should be able to install from GitHub. Now try to reinstall `utilsFFI`. If you're still running into issues, it could be that `devtools` is missing some package dependencies, which the error message will often mention. Install any missing packages and then try installing utilsFFI again. If you're still not successful, send Kate Miller (kathryn_miller@nps.gov) a screenshot of the error and she'll help you troubleshoot. 
 </details>
 <br>
-<h4><b>Step 6.</b> Load utilsFFI R package</h4>
+<h4><b>Step 7.</b> Load utilsFFI R package</h4>
 ```{r}
 library(utilsFFI)
 ```
-<h4><b>Step 7.</b> Import data</h4>
-Note that R is not able to connect to files on Sharepoint or MS Teams (Teams also stores all files on Sharepoint). That means you need to store data package files on your local machine or on a server. The default option for importing data will add the data package views (i.e., flatfiles) to an environment called FFI_tables to your Environment work space (i.e. Environment tab in top right panel). If you would rather import each individual view into your R session, specify with the new_env argument (e.g., `importData(new_env = F)`).
+<br>
+<h4><b>Step 8.</b> Import data</h4>
+Note that R is not able to connect to files on Sharepoint or MS Teams (Teams also stores all files on Sharepoint). That means you need to store data package files on your local machine or on a server. The default option for importing data will add the data package views (i.e., flatfiles) to an environment called FFI_tables to your Environment work space (i.e. Environment tab in top right panel).
 ```{r echo = F, results = 'hide', include = F}
 library(utilsFFI)
 importData(dbname = "FFI_RA_AGFO")
@@ -139,18 +154,36 @@ importData(dbname = "FFI_RA_AGFO")
 library(utilsFFI)
 importData(dbname = "FFI_RA_AGFO")
 ```
+<br>
+<h4><b>Optional: Export Data to a zip file</b></h4>
+If you want to export all the tables into a zip file of csvs, you can run the `exportData()` function like below.
 
-<h4><b>Step 8.</b> Play with the data </h4>
+Export data using default settings, which will save a zip file named FFI_tables_YYYYMMDD.zip with the YYYYMMDD being a datestamp for when the zip was created, and saved to your working directory. 
+```{r, eval = F}
+exportData()
+```
+
+The better approach is to name the zip file the same as the SSMS database that you originally imported. The code below exports a zip named FFI_RA_AGFO_YYYYMMDD.zip to working directory.
+```{r, eval = F}
+exportData(zip_name = "FFI_RA_AGFO")
+```
+
+Export data to a named zip file and a specific directory. 
+```{r, eval = F}
+exportData(zip_name = "FFI_RA_AGFO", path = "C:/temp")
+```
+<br>
+<h4><b>Step 9.</b> Play with the data </h4>
 The functions in the `utilsFFI` package are designed to work with the views, and are the best way to interact with the data to query by park, site, site type, year, parameter, etc. However, if you want to view the raw data, and you imported the data into the FFI_tables environment, you can access them with the code below:
 ```{r eval = F}
 # See list of the views
 names(FFI_tables)
 
-# View one of the views
-View(FFI_tables$Results)
+# View one the MacroPlot table
+View(FFI_tables$MacroPlot)
 
-# Assign a view to a data frame named res in R. Interact with res the way you would work with any normal data frame in R. 
-res <- FFI_tables$Results
+# Assign the macroplot table to the object macro, which now behaves like a data.frame.
+macro <- FFI_tables$MacroPlot
 
 ```
 
