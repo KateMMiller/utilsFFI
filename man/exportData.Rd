@@ -12,7 +12,7 @@ If not specified, default name will be "FFI_table_export_YYYYMMDD.zip", with the
 YYYYMMMDD being a date stamp for when the data were exported. Best practice would
 be to name it the same as the dbname used for the importData() step.}
 
-\item{export_path}{Quoted string to export zipped csvs to if export = TRUE.
+\item{path}{Quoted string to export zipped csvs to if export = TRUE.
 If not specified, will export to the working directory.}
 }
 \value{

@@ -10,7 +10,7 @@
 #' YYYYMMMDD being a date stamp for when the data were exported. Best practice would
 #' be to name it the same as the dbname used for the importData() step.
 #'
-#' @param export_path Quoted string to export zipped csvs to if export = TRUE.
+#' @param path Quoted string to export zipped csvs to if export = TRUE.
 #' If not specified, will export to the working directory.
 #'
 #' @examples
