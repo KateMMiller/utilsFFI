@@ -4,7 +4,13 @@
 \alias{importData}
 \title{importData}
 \usage{
-importData(type = "local", server = NA, dbname = "FFI_RA_AGFO")
+importData(
+  type = "local",
+  server = NA,
+  dbname = "FFI_RA_AGFO",
+  import_path = NA,
+  new_env = T
+)
 }
 \arguments{
 \item{type}{Indicate how to import the database tables
@@ -13,11 +19,18 @@ importData(type = "local", server = NA, dbname = "FFI_RA_AGFO")
 FFI database in SQL Server Management Studio (SSMS).}
 \item{"server"}{[**NOT YET ENABLED**] Import tables in 'dbo' schema from the
 FFI database on the production SQL Server).}
+\item{"csv"}{Import a zip file of csv FFI tables.}
  }}
 
 \item{dbname}{Quoted name of database matching the name of the database as it
 appears in SQL Server Management Studio
 (eg. "FFI_RA_AGFO").}
+
+\item{import_path}{Quoted string to import a zipped file of csvs if type = 'csv'.
+The name of the zipped file should be included in the path.}
+
+\item{new_env}{If TRUE (Default), will assign tables to an environment called FFI_tables.
+If FALSE, will assign tables to the global environment.}
 }
 \value{
 An environment with database tables as data frames for each imported database.
@@ -29,7 +42,7 @@ of a park's FFI database in SQL Server Management Studio (SSMS), but the goal is
 add an option for importing directly from the SQL Server where the production
 FFI databases are housed. Currently only works with one park/project at a time,
 but could be extended to import multiple parks/projects (see importData function
-in katemmiller/vegcomNGPN).
+in katemmiller/plantcomNGPN).
 }
 \examples{
 \dontrun{
@@ -37,6 +50,12 @@ in katemmiller/vegcomNGPN).
 # Import data for AGFO
 library(utilsFFI)
 importData(dbname = "FFI_RA_AGFO")
+
+# Import data into global environment instead of FFI_tables environment
+importData(dbname = "FFI_RA_BADL", new_env = F)
+
+# Import data as a zip file of csvs
+importData(type = "csv", import_path = "C:/temp/FFI_table_export_20250624.zip")
 
 # Check that the import worked by listing names of tables in FFI_tables
 names(FFI_tables)
