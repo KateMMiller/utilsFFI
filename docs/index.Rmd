@@ -49,12 +49,10 @@ h4{
 
 #### Installation
 <h4><b>Overview</b></h4>
-The `utilsFFI` package is a work in progress R package built by NPS users of FFI (FEAT/FIREMON Integrated) data. Currently this package only has an `importData()` function that imports all tables in the "dbo" schema from a local instance of an FFI database in SQL Server Management Studio (SSMS). Eventually, this package will allow a user with appropriate access the FFI server to download real-time data tables into R. 
-
-In time, more features will be added, such as functions that join the database tables to make them analysis- ready and allow for easy querying and summarizing. This documentation will be updated as more features are added.
+The `utilsFFI` package is a work in progress R package built by NPS users of FFI (FEAT/FIREMON Integrated) data. Currently this package has functions to import all tables in the "dbo" schema from a local instance of an FFI database in SQL Server Management Studio (SSMS), export those tables to a zip file of csvs for more widespread use, and a function that joins tables into analysis-ready views. Eventually, this package will allow a user with appropriate access the FFI server to download real-time data tables into R, and functions for querying and summarizing the analysis-ready views. This documentation will be updated as more features are added.
 <br>
 <h4><b>Step 1.</b> Install SQL Server Management Studio</h4>
-Instructions for installing SQL Server Management Studio (SSMS) are currently being developed. Once those are ready, they will be linked here. 
+Instructions for installing SQL Server Management Studio (SSMS) are currently being developed. Once those are ready, they will be linked here. Until then, the best directions currently (though a few years out of date and only accessible by DOI users) can be found here: <a href="https://doimspp-my.sharepoint.com/:w:/g/personal/kmmiller_nps_gov/ET6yKk-t50pPqDGm4m15hdkB11Pimv8AvKEC54dEo8PjPA?e=nCCm8u">SOP_SQLServer_Setup.docx</a>. 
 <br>
 <h4><b>Step 2.</b> Restore database from .bak file in SSMS</h4>
 To restore a database from a .bak file in SSMS, you can either restore through the file menu following the screencast or run the SQL code in SSMS below. 
@@ -147,7 +145,7 @@ library(utilsFFI)
 #### Import/Export Functions {.tabset}
 ##### Import Data
 <h4><b>Import FFI database tables</b></h4>
-Note that R is not able to connect to files on Sharepoint or MS Teams (Teams also stores all files on Sharepoint). That means you need to store data package files on your local machine or on a server. The default option for importing data will add the data package views (i.e., flatfiles) to an environment called FFI_tables to your Environment work space (i.e. Environment tab in top right panel).
+Once you complete the installation steps and can load the utilsFFI package, you can import data. Note that R is not able to connect to files on Sharepoint or MS Teams (Teams also stores all files on Sharepoint). That means you need to store data package files on your local machine or on a server. The default option for importing data will add the FFI database tables to an environment called FFI_tables in your Environment work space (i.e. Environment tab in top right panel).
 
 <p class = 'fxn'>Import data using type = 'local', which is a database restored in SSMS called FFI_RA_AGFO.</p>
 ```{r echo = F, results = 'hide', include = F}
@@ -169,9 +167,9 @@ importData(type = 'csv', import_path = "C:/temp/FFI_table_export_20250624.zip")
 <br>
 
 <h4><b>Explore the raw data</b></h4>
-The functions in the `utilsFFI` package are designed to work with the views, and are the best way to interact with the data to query by park, site, site type, year, parameter, etc. However, if you want to look at the raw data tables, and you imported the data into the FFI_tables environment, you can access them with the code below:
+The functions in the `utilsFFI` package are designed to work with flattened views of the FFI tables, rather than the raw tables themselves, and are the best way to interact with the data to query by park, site, site type, year, parameter, etc. However, if you want to look at the raw data tables, and you imported the data into the FFI_tables environment, you can access them with the code below:
 ```{r eval = F}
-# See list of the views
+# See list of the tables
 sort(names(FFI_tables))
 
 # View one the MacroPlot table
