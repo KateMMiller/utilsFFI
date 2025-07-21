@@ -479,7 +479,7 @@ Sys.setenv(BINPREF = &quot;C:\\PROGRA~1\\Rtools44\\mingw_$(WIN)\\bin\\&quot;)</c
 <h4>
 <b>Step 4.</b> Install devtools package in R:
 </h4>
-<pre class="r indent"><code>install.packages(&#39;devtools&#39;)</code></pre>
+<pre class="r"><code>install.packages(&#39;devtools&#39;)</code></pre>
 <br>
 <h4>
 <b>Step 5.</b> Set up GitHub account if a new user
@@ -530,9 +530,14 @@ she’ll help you troubleshoot.
 <b>Step 7.</b> Load utilsFFI R package
 </h4>
 <pre class="r"><code>library(utilsFFI)</code></pre>
-<br>
+<p><br></p>
+</div>
+<div id="importexport-functions" class="section level4 tabset">
+<h4 class="tabset">Import/Export Functions</h4>
+<div id="import-data" class="section level5">
+<h5>Import Data</h5>
 <h4>
-<b>Step 8.</b> Import data
+<b>Import FFI database tables</b>
 </h4>
 <p>Note that R is not able to connect to files on Sharepoint or MS Teams
 (Teams also stores all files on Sharepoint). That means you need to
@@ -540,41 +545,115 @@ store data package files on your local machine or on a server. The
 default option for importing data will add the data package views (i.e.,
 flatfiles) to an environment called FFI_tables to your Environment work
 space (i.e. Environment tab in top right panel).</p>
+<p class="fxn">
+Import data using type = ‘local’, which is a database restored in SSMS
+called FFI_RA_AGFO.
+</p>
 <pre class="r"><code>library(utilsFFI)
+importData(type = &#39;local&#39;, dbname = &quot;FFI_RA_AGFO&quot;)
+# equivalent to code below because type = &#39;local&#39; is default
 importData(dbname = &quot;FFI_RA_AGFO&quot;)</code></pre>
-<br>
+<p class="fxn">
+Import zip file of exported FFI tables that are csvs.
+</p>
+<pre class="r"><code>importData(type = &#39;csv&#39;, import_path = &quot;C:/temp/FFI_table_export_20250624.zip&quot;)</code></pre>
+<p><br></p>
 <h4>
-<b>Optional: Export Data to a zip file</b>
-</h4>
-<p>If you want to export all the tables into a zip file of csvs, you can
-run the <code>exportData()</code> function like below.</p>
-<p>Export data using default settings, which will save a zip file named
-FFI_tables_YYYYMMDD.zip with the YYYYMMDD being a datestamp for when the
-zip was created, and saved to your working directory.</p>
-<pre class="r"><code>exportData()</code></pre>
-<p>The better approach is to name the zip file the same as the SSMS
-database that you originally imported. The code below exports a zip
-named FFI_RA_AGFO_YYYYMMDD.zip to working directory.</p>
-<pre class="r"><code>exportData(zip_name = &quot;FFI_RA_AGFO&quot;)</code></pre>
-<p>Export data to a named zip file and a specific directory.</p>
-<pre class="r"><code>exportData(zip_name = &quot;FFI_RA_AGFO&quot;, path = &quot;C:/temp&quot;)</code></pre>
-<br>
-<h4>
-<b>Step 9.</b> Play with the data
+<b>Explore the raw data</b>
 </h4>
 <p>The functions in the <code>utilsFFI</code> package are designed to
 work with the views, and are the best way to interact with the data to
 query by park, site, site type, year, parameter, etc. However, if you
-want to view the raw data, and you imported the data into the FFI_tables
-environment, you can access them with the code below:</p>
+want to look at the raw data tables, and you imported the data into the
+FFI_tables environment, you can access them with the code below:</p>
 <pre class="r"><code># See list of the views
-names(FFI_tables)
+sort(names(FFI_tables))
 
 # View one the MacroPlot table
 View(FFI_tables$MacroPlot)
 
 # Assign the macroplot table to the object macro, which now behaves like a data.frame.
 macro &lt;- FFI_tables$MacroPlot</code></pre>
+</div>
+<div id="export-data" class="section level5">
+<h5>Export Data</h5>
+<h4>
+<b>Export tables to zip</b>
+</h4>
+<p>If you want to export all the tables into a zip file of csvs, you can
+run the <code>exportData()</code> function like below. The better
+approach is to name the zip file the same as the SSMS database that you
+originally imported. The code below exports a zip named
+FFI_RA_AGFO_YYYYMMDD.zip to working directory.</p>
+<p class="fxn">
+Export data using default settings
+</p>
+. This will save a zip file named FFI_tables_YYYYMMDD.zip with the
+YYYYMMDD being a datestamp for when the zip was created, and saved to
+your working directory.
+</p>
+<pre class="r"><code>exportData()</code></pre>
+<br>
+<p class="fxn">
+Export a zip named FFI_RA_AGFO_YYYYMMDD.zip to working directory.
+</p>
+<pre class="r"><code>exportData(zip_name = &quot;FFI_RA_AGFO&quot;)</code></pre>
+<br>
+<p class="fxn">
+Export data to a named zip file and a specific directory.
+</p>
+<pre class="r"><code>exportData(zip_name = &quot;FFI_RA_AGFO&quot;, path = &quot;C:/temp&quot;)</code></pre>
+<p><br></p>
+</div>
+<div id="make-views" class="section level5">
+<h5>Make Views</h5>
+<h4>
+<b>Make the views</b>
+</h4>
+<p>This function generates flattened views of FFI data by protocol to
+make them stand-alone, analysis-ready using the code below. The views
+join individual tables in the database together and only keep the most
+important columns. Views were designed using FFI data from NGPN parks
+and may need to be tweaked for other parks/projects. If export_views =
+TRUE, will export the views as a zip file. Next I’ll build an
+importViews() function that will allow the user to import these views
+into R. Functions for querying and summarizing FFI data in this package
+will then use the views.</p>
+<p class="fxn">
+Make views using default settings
+</p>
+<pre class="r"><code>makeViews()</code></pre>
+<p class="fxn">
+Generate views and export zip to working directory
+</p>
+<pre class="r"><code>makeViews(export_views = T)</code></pre>
+<p class="fxn">
+Generate views and export zip to specified path and name
+</p>
+<pre class="r"><code>makeViews(export_views = T, export_path = &quot;C:/temp&quot;, zip_name = &quot;FFI_view_export&quot;)</code></pre>
+<br>
+<h4>
+<b>Explore the views</b>
+</h4>
+<p>The functions in the <code>utilsFFI</code> package are designed to
+work with the views, and are the best way to interact with the data to
+query by park, site, site type, year, parameter, etc. However, if you
+want to look at the raw data tables, and you imported the data into the
+FFI_tables environment, you can access them with the code below:</p>
+<pre class="r"><code># See list of the views
+sort(names(FFI_views))</code></pre>
+<pre><code>## [1] &quot;Cover_Points_metric&quot;      
+## [2] &quot;Cover_Species_Composition&quot;
+## [3] &quot;Density_Belts_metric&quot;     
+## [4] &quot;Disturbance_History&quot;      
+## [5] &quot;MacroPlots&quot;               
+## [6] &quot;SampleEvents&quot;             
+## [7] &quot;Taxa_Table&quot;</code></pre>
+<pre class="r"><code># View one the MacroPlot table
+View(FFI_views$Cover_Points_metric)</code></pre>
+<pre class="r"><code># Assign the Cover_Points_metric view to the object covpts, which now behaves like a data.frame.
+covpts &lt;- FFI_views$Cover_Points_metric</code></pre>
+</div>
 </div>
 <div id="getting-help" class="section level4">
 <h4>Getting help</h4>

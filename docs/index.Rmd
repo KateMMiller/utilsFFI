@@ -113,7 +113,7 @@ Sys.setenv(BINPREF = "C:\\PROGRA~1\\Rtools44\\mingw_$(WIN)\\bin\\")
 </details>
 <br>
 <h4><b>Step 4.</b> Install devtools package in R:</h4>
-```{r, eval = F, class.source = "indent"}
+```{r, eval = F}
 install.packages('devtools')
 ```
 <br>
@@ -143,8 +143,13 @@ Once this script is open in R Studio, press Control + A to select all of the cod
 library(utilsFFI)
 ```
 <br>
-<h4><b>Step 8.</b> Import data</h4>
+
+#### Import/Export Functions {.tabset}
+##### Import Data
+<h4><b>Import FFI database tables</b></h4>
 Note that R is not able to connect to files on Sharepoint or MS Teams (Teams also stores all files on Sharepoint). That means you need to store data package files on your local machine or on a server. The default option for importing data will add the data package views (i.e., flatfiles) to an environment called FFI_tables to your Environment work space (i.e. Environment tab in top right panel).
+
+<p class = 'fxn'>Import data using type = 'local', which is a database restored in SSMS called FFI_RA_AGFO.</p>
 ```{r echo = F, results = 'hide', include = F}
 library(utilsFFI)
 importData(dbname = "FFI_RA_AGFO")
@@ -152,32 +157,22 @@ importData(dbname = "FFI_RA_AGFO")
 
 ```{r eval = F}
 library(utilsFFI)
+importData(type = 'local', dbname = "FFI_RA_AGFO")
+# equivalent to code below because type = 'local' is default
 importData(dbname = "FFI_RA_AGFO")
 ```
-<br>
-<h4><b>Optional: Export Data to a zip file</b></h4>
-If you want to export all the tables into a zip file of csvs, you can run the `exportData()` function like below.
 
-Export data using default settings, which will save a zip file named FFI_tables_YYYYMMDD.zip with the YYYYMMDD being a datestamp for when the zip was created, and saved to your working directory. 
-```{r, eval = F}
-exportData()
-```
-
-The better approach is to name the zip file the same as the SSMS database that you originally imported. The code below exports a zip named FFI_RA_AGFO_YYYYMMDD.zip to working directory.
-```{r, eval = F}
-exportData(zip_name = "FFI_RA_AGFO")
-```
-
-Export data to a named zip file and a specific directory. 
-```{r, eval = F}
-exportData(zip_name = "FFI_RA_AGFO", path = "C:/temp")
+<p class = 'fxn'>Import zip file of exported FFI tables that are csvs.</p>
+```{r eval = F}
+importData(type = 'csv', import_path = "C:/temp/FFI_table_export_20250624.zip")
 ```
 <br>
-<h4><b>Step 9.</b> Play with the data </h4>
-The functions in the `utilsFFI` package are designed to work with the views, and are the best way to interact with the data to query by park, site, site type, year, parameter, etc. However, if you want to view the raw data, and you imported the data into the FFI_tables environment, you can access them with the code below:
+
+<h4><b>Explore the raw data</b></h4>
+The functions in the `utilsFFI` package are designed to work with the views, and are the best way to interact with the data to query by park, site, site type, year, parameter, etc. However, if you want to look at the raw data tables, and you imported the data into the FFI_tables environment, you can access them with the code below:
 ```{r eval = F}
 # See list of the views
-names(FFI_tables)
+sort(names(FFI_tables))
 
 # View one the MacroPlot table
 View(FFI_tables$MacroPlot)
@@ -186,6 +181,63 @@ View(FFI_tables$MacroPlot)
 macro <- FFI_tables$MacroPlot
 
 ```
+
+##### Export Data
+<h4><b>Export tables to zip</b></h4>
+If you want to export all the tables into a zip file of csvs, you can run the `exportData()` function like below. The better approach is to name the zip file the same as the SSMS database that you originally imported. The code below exports a zip named FFI_RA_AGFO_YYYYMMDD.zip to working directory.
+
+<p class = 'fxn'>Export data using default settings</p>. This will save a zip file named FFI_tables_YYYYMMDD.zip with the YYYYMMDD being a datestamp for when the zip was created, and saved to your working directory. </p>
+```{r, eval = F}
+exportData()
+```
+<br>
+<p class = 'fxn'>Export a zip named FFI_RA_AGFO_YYYYMMDD.zip to working directory.</p>
+```{r, eval = F}
+exportData(zip_name = "FFI_RA_AGFO")
+```
+<br>
+<p class = 'fxn'>Export data to a named zip file and a specific directory. </p>
+```{r, eval = F}
+exportData(zip_name = "FFI_RA_AGFO", path = "C:/temp")
+```
+<br>
+
+
+##### Make Views 
+<h4><b>Make the views</b></h4>
+This function generates flattened views of FFI data by protocol to make them stand-alone, analysis-ready using the code below. The views join individual tables in the database together and only keep the most important columns. Views were designed using FFI data from NGPN parks and may need to be tweaked for other parks/projects. If export_views = TRUE, will export the views as a zip file. Next I'll build an importViews() function that will allow the user to import these views into R. Functions for querying and summarizing FFI data in this package will then use the views. 
+
+<p class='fxn'>Make views using default settings</p>
+```{r results = 'hide', warning = 'hide', message = 'hide'}
+makeViews()
+```
+
+<p class='fxn'>Generate views and export zip to working directory</p>
+```{r eval = F, warning = 'hide', message = 'hide'}
+makeViews(export_views = T)
+```
+
+<p class='fxn'>Generate views and export zip to specified path and name</p>
+```{r eval = F, warning = 'hide', message = 'hide'}
+makeViews(export_views = T, export_path = "C:/temp", zip_name = "FFI_view_export")
+```
+<br>
+<h4><b>Explore the views</b></h4>
+The functions in the `utilsFFI` package are designed to work with the views, and are the best way to interact with the data to query by park, site, site type, year, parameter, etc. However, if you want to look at the raw data tables, and you imported the data into the FFI_tables environment, you can access them with the code below:
+```{r }
+# See list of the views
+sort(names(FFI_views))
+```
+```{r eval = F}
+# View one the MacroPlot table
+View(FFI_views$Cover_Points_metric)
+```
+```{r  eval = F}
+# Assign the Cover_Points_metric view to the object covpts, which now behaves like a data.frame.
+covpts <- FFI_views$Cover_Points_metric
+```
+
+
 
 #### Getting help
 <h4><b>Getting (and improving) help</b></h4>
