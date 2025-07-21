@@ -3,7 +3,7 @@
 #' @description Exports data tables that were imported from the FFI database
 #' tables in the 'dbo' schema as a zip file of csvs. Currently only works with one
 #' park/project at a time, but could be extended to import multiple parks/projects
-#' (see importData function in katemmiller/vegcomNGPN).
+#' (see importData function in katemmiller/plantcomNGPN).
 #'
 #' @param zip_name Quoted string that names the exported zip file (eg. "FFI_RA_AGFO").
 #' If not specified, default name will be "FFI_table_export_YYYYMMDD.zip", with the
