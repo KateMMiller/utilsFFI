@@ -249,7 +249,13 @@ makeViews <- function(new_env = T, export_views = F, export_path = NA, zip_name 
   SampleEvents <- data.frame(sampev4[order(sampev4$MacroPlot_Name, sampev4$SampleEvent_Date),
                                      keep_cols_samp])
 
-  sampev_unique <- SampleEvents |> select(-MonitoringStatus_Comment, -MM_MonitoringStatus_GUID) |> unique()
+  sampev_unique1 <- SampleEvents |> select(-MonitoringStatus_Comment, -MM_MonitoringStatus_GUID) |> unique()
+  # Convert "" to NA so unique actually works
+  mon_cols <- c("DefaultMonitoringStatus", "MonitoringStatus_Prefix", "MonitoringStatus_Base",
+                "MonitoringStatus_Suffix", "MonitoringStatus_Name")
+  sampev_unique1[,mon_cols][sampev_unique1[,mon_cols] == ""] <- NA_character_
+  sampev_unique <- unique(sampev_unique1)
+
   # Prevents some duplication of data until monitoring status is fixed in database.
   sampev_guids <- unique(sampev_unique$SampleEvent_GUID)
 
@@ -375,6 +381,11 @@ makeViews <- function(new_env = T, export_views = F, export_path = NA, zip_name 
                        "MacroPlot_GUID", "SampleEvent_GUID", #"MM_MonitoringStatus_GUID",
                        "RegistrationUnit_GUID",
                        "Spp_GUID")
+
+    cols_view_end_nospp <- c("UV1Desc", "UV2Desc", "UV3Desc", "SaComment",
+                       "DefaultMonitoringStatus", "MonitoringStatus_Base",
+                       "MacroPlot_GUID", "SampleEvent_GUID", #"MM_MonitoringStatus_GUID",
+                       "RegistrationUnit_GUID")
     cols_taxa_start <- c("Symbol", "ITIS_TSN", "ScientificName", "CommonName")
     cols_taxa_end <- c("Nativity", "Invasive", "Cultural", "Concern", "LifeCycle", "LifeForm_Name",
                        "NotBiological", "Species_Comment")
