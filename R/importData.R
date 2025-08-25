@@ -159,9 +159,7 @@ importData <- function(type = "local", server = NA, dbname = "FFI_RA_AGFO",
     z_list = sort(zfiles[grepl(paste0(csv_list1, collapse = "|"), zfiles)])
 
     # Drop date stamp (if it exists) from file name if exists in 2 steps
-    z_list_names <- gsub("[[:digit:]]+|.csv", "", z_list)
-    z_list_names <- gsub("./", "", z_list_names)
-    z_list_names <- gsub("_$","", z_list_names)
+    z_list_names <- gsub("*.csv", "", z_list)
 
     # Drop csvs from csv_list not in z_list
     csv_list <- csv_list1[csv_list1 %in% z_list_names]
